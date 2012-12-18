@@ -1,0 +1,20 @@
+#!/bin/sh
+set -e
+if [ "$#" -eq 0 ];then
+  echo "  Usage: ${0##*/} [directory]"
+  exit 1
+fi
+
+mpath=$(echo $1 | sed 's/\/$//')
+
+mount_chroot(){
+  if ! mountpoint -q "$1/dev" ;then mount /dev $1/dev -o bind,nosuid,noexec;fi
+  if ! mountpoint -q "$1/proc";then mount -t proc proc "$1/proc" -o nosuid,noexec,nodev;fi 
+  if ! mountpoint -q "$1/sys" ;then mount -t sysfs sys "$1/sys" -o nosuid,noexec,nodev;fi
+  if ! mountpoint -q "$1/tmp" ;then mount /tmp "$1/tmp" -o bind,nosuid,nodev;fi
+}
+
+mount_chroot $mpath
+cp /etc/resolv.conf $1/etc/resolv.conf
+chroot $mpath  /bin/su -
+

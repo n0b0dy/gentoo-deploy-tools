@@ -1,0 +1,100 @@
+#!/bin/sh
+set -e
+DEF_MIRROR="http://mirror.yandex.ru/gentoo-distfiles/"
+DEF_ARCH="amd64"
+E_OPTERR=65
+SNFLAG=N
+SFLAGS=0
+PFLAGS=0
+
+stage3_list(){
+  url=$1
+  arch=$2
+  filter=$3
+  stage3_path="/releases/$arch/current-stage3/"
+  slist=$(wget -qO - $url$stage3_path | sed -ne "s/.*href=\"\(stage.*bz2\)\".*/\1/p" | sed -ne "s|^|$url$stage3_path|p")
+  show_result "$slist" "$filter"
+}
+
+portage_list() {
+  url="$1"
+  filter="$2"
+  portage_path='/snapshots/'
+  plist=$(wget -qO - $url$portage_path | sed -ne "s/.*href=\"\(portage-.*bz2\)\".*/\1/p" | sed -ne "s|^|$url$portage_path|p")
+  show_result "$plist" "$filter"
+}
+
+show_result(){
+list=$1
+filter=$2
+  if [ "$SNFLAG" = "Y" ]; then
+    list=$(echo "$list" | sed '/./=' | sed '/./N; s/\n/ /')
+  fi
+  
+  if [ -n "$filter" ]; then
+    echo "$list" | sed -n "$filter p"
+  else
+    echo "$list"
+  fi
+}
+
+usage(){ 
+echo "Usage: ${0##*/} [options]"
+cat <<EOF
+  -s    -stage3 list flag
+  -p    -portage list flag
+  -a    -set achitecture x86, amd64
+  -n    -show numbers
+  -m    -set mirror
+
+Version: 0.4.1
+Licence: GNU GPL version 3 <http://www.gnu.org/licenses/gpl.html>
+EOF
+exit 0
+}
+
+if [ "$#" -eq 0 ]; then usage;fi
+
+#getopt parser
+ARGS=$(getopt -n ${0##*/} -o 'hns::p::a:m:' -- "$@")
+eval set -- "$ARGS"
+if [ "$#" -eq 0 ];then usage;fi
+
+while [ "$1" != -- ]; do
+    case "$1" in
+        -p) FPORTAGE=$2;PFLAGS=1;shift;;
+        -s) FSTAGE3=$2;SFLAGS=1;shift;;
+        -n) SNFLAG=Y;;
+        -a) ARCH=$2;shift;;
+        -m) MIRROR_ARG=$2;shift;;
+        -h) usage;;
+    esac
+    shift
+done
+
+#опредиление архитектуры системы
+if [ -z "$ARCH" ];then
+ARCH=$DEF_ARCH
+march=$(uname -m )
+  case $march in
+    x86_64) ARCH="amd64";;
+    i686|i586) ARCH="x86";;
+  esac
+fi
+
+#проверка зеркала. Дефолтное из переменного окружения или параметров
+if [ -z "$mirror" ]; then
+  mirror=$(echo $DEF_MIRROR | sed 's/\/$//')
+fi
+
+if [ -n "$MIRROR_ARG" ];then 
+  mirror=$(echo $MIRROR_ARG | sed 's/\/$//')
+fi
+
+if [ "$SFLAGS" -eq 1 ];then
+  stage3_list "$mirror" "$ARCH" "$FSTAGE3"
+fi
+
+if [ "$PFLAGS" -eq 1 ];then
+  portage_list "$mirror" "$FPORTAGE"
+fi
