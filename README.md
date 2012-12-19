@@ -3,12 +3,11 @@
 
 Tools to deploy gentoo stage3 & portage
 
-
 ## Installation
 
 Install to /tmp
 
-    $ wget http://bit.ly/gdt-install && source gdt-install
+    $ eval "$(wget -O- bit.ly/gdt-install)" 
 
 ##Usage example
 Example use case tools
@@ -16,7 +15,7 @@ Example use case tools
 ### Fast deploy
 
     $ export stage3=$(glist -s1)         #get stage3 url 
-    $ export portage=$(glist -p9)        #get portage url
+    $ export portage=$(glist -p/latest/) #get portage url
     $ mount /dev/sd[x] /mnt              #mount partition
     $ gstrap -s $stage3 -p $portage /mnt #download & extract stage3 & portage
     $ gchroot /mnt                       #join chroot enviroment
