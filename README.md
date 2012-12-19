@@ -5,9 +5,9 @@ Tools to deploy gentoo stage3 & portage
 
 ## Installation
 
-Install to /tmp
+Install to $HOME/.gdt
 
-    $ eval "$(wget -O- bit.ly/gdt-install)" 
+    $ eval "$(wget -O- http://bit.ly/gdt-git)" 
 
 ##Usage example
 Example use case tools

@@ -1,0 +1,9 @@
+#!/bin/sh
+url="https://github.com/n0b0dy/gentoo-deploy-tools/archive/master.tar.gz"
+gdt_path="$HOME/.gdt"
+mkdir -p "$HOME/.gdt/bin"
+wget -O - $url | tar -C $gdt_path -xzvf -
+mv -f $gdt_path/gentoo-deploy-tools-master/* $gdt_path
+mv -f $gdt_path/gentoo-deploy-tools-master/.gdt.rc $gdt_path
+rmdir $gdt_path/gentoo-deploy-tools-master
+source $gdt_path/.gdt.rc $gdt_path/.gdt.rc
