@@ -1,5 +1,5 @@
 #!/bin/sh
-gdt_path="$(pwd)/$0"
+gdt_path="$0"
 gdt_path=${gdt_path%/*.rc}
 if ! which gmirrors 2>&1 >/dev/null; then
     export PATH="${gdt_path}/bin:${PATH}"
