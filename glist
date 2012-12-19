@@ -25,8 +25,8 @@ portage_list() {
 }
 
 show_result(){
-list=$1
-filter=$2
+  list=$1
+  filter=$2
   if [ "$SNFLAG" = "Y" ]; then
     list=$(echo "$list" | sed '/./=' | sed '/./N; s/\n/ /')
   fi
@@ -39,21 +39,24 @@ filter=$2
 }
 
 usage(){ 
-echo "Usage: ${0##*/} [options]"
+echo "Usage:
+  ${0##*/} [options]"
 cat <<EOF
-  -s    -stage3 list flag
-  -p    -portage list flag
-  -a    -set achitecture x86, amd64
-  -n    -show numbers
-  -m    -set mirror
+
+Application Options:
+  -s    Stage3 list flag
+  -p    Portage list flag
+  -a    Set achitecture x86, amd64
+  -n    Show numbers
+  -m    Set mirror
+  -h    Show help options
 
 Version: 0.4.1
 Licence: GNU GPL version 3 <http://www.gnu.org/licenses/gpl.html>
 EOF
-exit 0
 }
 
-if [ "$#" -eq 0 ]; then usage;fi
+if [ "$#" -eq 0 ]; then usage;exit 1;fi
 
 #getopt parser
 ARGS=$(getopt -n ${0##*/} -o 'hns::p::a:m:' -- "$@")
@@ -67,7 +70,7 @@ while [ "$1" != -- ]; do
         -n) SNFLAG=Y;;
         -a) ARCH=$2;shift;;
         -m) MIRROR_ARG=$2;shift;;
-        -h) usage;;
+        -h) usage;exit 0;;
     esac
     shift
 done

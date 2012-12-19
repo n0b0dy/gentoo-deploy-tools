@@ -1,0 +1,60 @@
+#!/bin/sh
+MIRROR_URL="www.gentoo.org/main/en/mirrors3.xml"
+PROTOCOL="http"
+SNFLAG=N
+
+usage(){ 
+  echo "Usage:
+  ${0##*/} [options]"
+  cat <<EOF
+
+Application Options:
+  -p    protocol ftp, http, rsync
+  -s    search mirror
+  -n    show line number 
+  -h    help
+
+Version: 0.4.1
+Licence: GNU GPL version 3 <http://www.gnu.org/licenses/gpl.html>
+EOF
+exit 0
+}
+ 
+mirror_list(){
+  protocol=$1
+  search=$2
+  mlist=$(wget -qO - $MIRROR_URL | grep '<uri' | sed -e 's/<[^>]*>//g' | sed -e 's/^\s*//g' | sed -ne "/^\($protocol\)/p"  | sort) 
+
+  if [ "$SNFLAG" = "Y" ]; then
+    mlist=$(echo "$mlist" | sed '/./=' | sed '/./N; s/\n/ /')
+  fi
+
+  if [ -n "$search" ]; then
+    echo "$mlist" | sed -n "$search p"
+  else
+    echo "$mlist"
+  fi
+}
+
+
+ARGS=$(getopt -n $(basename "$0") -o 'nhp:s::' -- "$@")
+#[ $? = 0 ] || exit 1
+eval set -- "$ARGS"
+
+while [ "$1" != -- ]
+do
+    case "$1" in
+       -p) PROTOCOL=$(echo $2 | sed -e 's/,/\\\|/');shift;;
+       -s) SEARCH=$2; shift;;
+       -n) SNFLAG=Y;;
+       -h) usage;;
+       --) shift;break;;
+       -*) usage;;
+        *) break;;            #better be the crawl directory
+    esac
+    shift
+done
+shift
+
+mirror_list $PROTOCOL $SEARCH
+

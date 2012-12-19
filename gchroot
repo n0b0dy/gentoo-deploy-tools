@@ -1,7 +1,19 @@
 #!/bin/sh
 set -e
-if [ "$#" -eq 0 ];then
-  echo "  Usage: ${0##*/} [directory]"
+usage(){ 
+	echo "Usage:
+  ${0##*/} [chroot path]"
+	cat <<EOF
+
+  -h    Show help options
+
+Version: 0.4.1
+Licence: GNU GPL version 3 <http://www.gnu.org/licenses/gpl.html>
+EOF
+}
+
+if [ "$#" -eq 0 ] || [ "$1" = "-h" ];then
+  usage
   exit 1
 fi
 
