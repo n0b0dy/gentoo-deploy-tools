@@ -1,6 +1,4 @@
 #!/bin/sh
-set -e
-
 STAGE3_PATH=""
 PORTAGE_PATH=""
 EXTRACT_PATH="."
@@ -12,7 +10,6 @@ stage3_download(){
 }
 
 portage_download() {
-	#wget -Nc  $MIRROR$portage_path$PNAME
   mkdir -p $EXTRACT_PATH"/usr"
   echo "Download portage: "
   wget -O - $PORTAGE_PATH | tar -C $EXTRACT_PATH"/usr" -xpjf -
@@ -38,23 +35,19 @@ Licence: GNU GPL version 3 <http://www.gnu.org/licenses/gpl.html>
 EOF
 }
  
-if [ "$#" -eq 0 ]; then usage;exit 0;fi
-
- 
-while getopts ":hs:p:" opt ;
-do
-  case $opt in
-		p) PORTAGE_PATH=$OPTARG ;;
-		s) STAGE3_PATH=$OPTARG;;
-		h) usage;;
-		*) echo "no args";
-           echo "For helps $ME -h";
-            exit 1
-            ;;
-  esac
+if [ "$#" -eq 0 ]; then usage;exit 1;fi
+ARGS=$(getopt -n ${0##*/} -o 'hns::p::a:m:' -- "$@")
+eval set -- "$ARGS"
+while [ "$1" != -- ]; do
+    case "$1" in
+        -p) PORTAGE_PATH=$2;shift;;
+        -s) STAGE3_PATH=$2;shift;;
+        -h) usage;exit 0;;
+    esac
+    shift
 done
-#shift $(( OPTIND - 1 )) shift $(($OPTIND-1))
-shift $(expr $# - 1) # получение последнего аргумента
+
+shift $(expr $# - 1) 
 EXTRACT_PATH=$1
 ####################################################
 
@@ -67,3 +60,5 @@ fi
 if [ -n "$PORTAGE_PATH" ]; then
 	portage_download;
 fi
+exit 0
+

@@ -1,6 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 gdt_path="${BASH_SOURCE:-$0}"
 gdt_path=$(dirname $gdt_path)
 if ! which {gmirrors,glist,gstrap,gchroot} 2>&1 >/dev/null; then
     export PATH="${gdt_path}/bin:${PATH}"
 fi
+unset gdt_path

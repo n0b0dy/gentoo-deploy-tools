@@ -2,6 +2,7 @@
 MIRROR_URL="www.gentoo.org/main/en/mirrors3.xml"
 PROTOCOL="http"
 SNFLAG=N
+SEARCH=''
 
 usage(){ 
   echo "Usage:
@@ -38,7 +39,7 @@ mirror_list(){
 
 
 ARGS=$(getopt -n $(basename "$0") -o 'nhp:s::' -- "$@")
-#[ $? = 0 ] || exit 1
+
 eval set -- "$ARGS"
 
 while [ "$1" != -- ]
@@ -57,4 +58,5 @@ done
 shift
 
 mirror_list $PROTOCOL $SEARCH
+exit 0
 

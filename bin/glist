@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e
 DEF_MIRROR="http://mirror.yandex.ru/gentoo-distfiles/"
 DEF_ARCH="amd64"
 E_OPTERR=65
@@ -56,12 +55,12 @@ Licence: GNU GPL version 3 <http://www.gnu.org/licenses/gpl.html>
 EOF
 }
 
-if [ "$#" -eq 0 ]; then usage;exit 1;fi
 
+if [ "$#" -eq 0 ]; then usage;exit 1;fi
 #getopt parser
 ARGS=$(getopt -n ${0##*/} -o 'hns::p::a:m:' -- "$@")
 eval set -- "$ARGS"
-if [ "$#" -eq 0 ];then usage;fi
+
 
 while [ "$1" != -- ]; do
     case "$1" in
@@ -75,7 +74,7 @@ while [ "$1" != -- ]; do
     shift
 done
 
-#опредиление архитектуры системы
+#define system architecture
 if [ -z "$ARCH" ];then
 ARCH=$DEF_ARCH
 march=$(uname -m )
@@ -85,7 +84,7 @@ march=$(uname -m )
   esac
 fi
 
-#проверка зеркала. Дефолтное из переменного окружения или параметров
+#check mirror params
 if [ -z "$mirror" ]; then
   mirror=$(echo $DEF_MIRROR | sed 's/\/$//')
 fi
@@ -101,3 +100,5 @@ fi
 if [ "$PFLAGS" -eq 1 ];then
   portage_list "$mirror" "$FPORTAGE"
 fi
+
+exit 0

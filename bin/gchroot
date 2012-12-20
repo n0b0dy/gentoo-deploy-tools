@@ -4,7 +4,7 @@ usage(){
 	echo "Usage:
   ${0##*/} [chroot path]"
 	cat <<EOF
-  -n    no join chroot enviroment 
+  -j    join chroot enviroment 
   -h    Show help options
 
 Version: 0.4.1
@@ -22,9 +22,7 @@ mount_chroot(){
 if [ "$#" -eq 0 ];then usage; exit 1; fi
 
 ARGS=$(getopt -n $(basename "$0") -o 'hj' -- "$@")
-
 eval set -- "$ARGS"
-
 while [ "$1" != -- ]; do
     case "$1" in
         -j) JOIN=Y;;
@@ -47,5 +45,4 @@ fi
 if [ $JOIN = "Y" ];then
   chroot $mpath  /bin/su -
 fi
-
-
+exit 0
