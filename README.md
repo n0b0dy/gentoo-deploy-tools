@@ -18,7 +18,7 @@ Example use case tools
     $ export portage=$(glist -p/latest/) #get portage url
     $ mount /dev/sd[x] /mnt              #mount partition
     $ gstrap -s $stage3 -p $portage /mnt #download & extract stage3 & portage
-    $ gchroot /mnt                       #join chroot enviroment
+    $ gchroot -j /mnt                    #join chroot enviroment
 
 ###gmirrors
 
@@ -36,9 +36,10 @@ Search mirror number 6
 
 Search mirror regexp .ru/
 
-    $ gmirrors -s/\\.ru\\//  # 
+    $ gmirrors -s/\\.ru\\// 
 
 Show all gentoo mirrors available on http,ftp,rsynс protocol
 
     $ gmirrors -p http,ftp,rsynс
-
+##License
+![GPLv3](http://www.gnu.org/graphics/gplv3-127x51.png)
