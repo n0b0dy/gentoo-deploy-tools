@@ -24,7 +24,7 @@ fi
 
 if mv -f $gdt_path/$gdt_arch/bin/{gchroot,glist,gmirrors,gstrap} \
     $gdt_path/bin 2>&1 >/dev/null\
-&&  mv -f $gdt_path/$gdt_arch/{.gdt.rc,license,README.md} \
+&&  mv -f $gdt_path/$gdt_arch/{gdt.rc,license,README.md} \
     $gdt_path 2>&1 >/dev/null
 then
   rm -rf "${gdt_path}/${gdt_arch}"
@@ -33,8 +33,8 @@ else
   print_fail "Install\t\t"
 fi
 
-source "${gdt_path}/.gdt.rc"
-if . $gdt_path/.gdt.rc && which {gchroot,glist,gmirrors,gstrap} 2>&1 >/dev/null
+source "${gdt_path}/gdt.rc"
+if . $gdt_path/gdt.rc && which {gchroot,glist,gmirrors,gstrap} 2>&1 >/dev/null
 then
   print_ok    "Environment variable"
 else
