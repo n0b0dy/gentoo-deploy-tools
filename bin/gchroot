@@ -1,10 +1,10 @@
 #!/bin/sh
-JOIN=N
+JOIN=Y
 usage(){ 
 	echo "Usage:
   ${0##*/} [chroot path]"
 	cat <<EOF
-  -j    join chroot enviroment 
+  -m    make only chroot enviroment 
   -h    Show help options
 
 Version: 0.4.1
@@ -21,11 +21,11 @@ mount_chroot(){
 
 if [ "$#" -eq 0 ];then usage; exit 1; fi
 
-ARGS=$(getopt -n $(basename "$0") -o 'hj' -- "$@")
+ARGS=$(getopt -n $(basename "$0") -o 'hm' -- "$@")
 eval set -- "$ARGS"
 while [ "$1" != -- ]; do
     case "$1" in
-        -j) JOIN=Y;;
+        -m) JOIN=N;;
         -h) usage;exit 0;;
     esac
     shift
