@@ -34,15 +34,14 @@ then
 else
   print_fail "Install\t\t"
 fi
-
-. "${gdt_path}/gdt.rc"
-if . $gdt_path/gdt.rc && which {gchroot,glist,gmirrors,gstrap} 2>&1 >/dev/null
+. $gdt_path/gdt.rc
+if  which {gchroot,glist,gmirrors,gstrap} 2>&1 >/dev/null
 then
   print_ok    "Environment variable"
 else
   print_fail "Environment variable"
 fi
+echo -e "\033[33m» \033[00m Install complite to $gdt_path"
+echo -e "\033[33m» \033[00m Version: \033[4;33m${GDT_VERSION}\033[0;00m"
 unset gdt_path
 unset gdt_arch
-print_ok "Install complite\t"
-echo -e "\033[33m» \033[00m Version: \033[4;33m${GDT_VERSION}\033[0;00m"
