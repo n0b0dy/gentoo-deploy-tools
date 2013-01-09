@@ -3,7 +3,7 @@ MIRROR_URL="www.gentoo.org/main/en/mirrors3.xml"
 PROTOCOL="http"
 SNFLAG=N
 SEARCH=''
-
+VERSION=0.4.3
 usage(){ 
   echo "Usage:
   ${0##*/} [options]"
@@ -15,7 +15,7 @@ Application Options:
   -n    show line number 
   -h    help
 
-Version: 0.4.1
+Version: $VERSION
 Licence: GNU GPL version 3 <http://www.gnu.org/licenses/gpl.html>
 EOF
 exit 0

@@ -5,6 +5,7 @@ E_OPTERR=65
 SNFLAG=N
 SFLAGS=0
 PFLAGS=0
+VERSION=0.4.3
 
 stage3_list(){
   url=$1
@@ -50,7 +51,7 @@ Application Options:
   -m    Set mirror
   -h    Show help options
 
-Version: 0.4.1
+Version: $VERSION
 Licence: GNU GPL version 3 <http://www.gnu.org/licenses/gpl.html>
 EOF
 }
