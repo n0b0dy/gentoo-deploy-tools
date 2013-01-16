@@ -45,7 +45,7 @@ eval set -- "$ARGS"
 while [ "$1" != -- ]
 do
     case "$1" in
-       -p) PROTOCOL=$(echo $2 | sed -e 's/,/\\\|/');shift;;
+       -p) PROTOCOL=$(echo $2 | sed -e 's/,/\\\|/g');shift;;
        -s) SEARCH=$2; shift;;
        -n) SNFLAG=Y;;
        -h) usage;;
