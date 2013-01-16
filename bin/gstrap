@@ -45,7 +45,7 @@ portage_download() {
 
 usage(){ 
 	echo "Usage:
-  ${0##*/} [options] extract path"
+  ${0##*/} [options] [extract path]"
 	cat <<EOF
 
 Application Options:
@@ -72,6 +72,10 @@ while [ "$1" != -- ]; do
 done
 
 shift $(expr $# - 1) 
+if [ -z "$1" ] || [ "$1"=="--" ]; then
+    usage
+    exit 1
+fi
 EXTRACT_PATH=$1
 ####################################################
 
