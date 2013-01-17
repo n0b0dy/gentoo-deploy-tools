@@ -12,7 +12,11 @@ stage3_list(){
   arch=$2
   filter=$3
   stage3_path="/releases/$arch/current-stage3/"
-  slist=$(wget -qO - $url$stage3_path | sed -ne "s/.*href=\"\(stage.*bz2\)\".*/\1/p" | sed -ne "s|^|$url$stage3_path|p")
+  slist=$(wget -qO - $url$stage3_path | sed -ne "s/.*href=\"\(.*stage.*bz2\)\".*/\1/p")
+  protocol_url=$(echo "$slist"| head -n1 | sed -ne "s/^\(http\|ftp\)\:.*/\1/p")
+  if [ -z "$protocol_url" ]; then
+    slist=$( echo "slist" | sed -ne "s|^|$url$stage3_path|p")
+  fi
   show_result "$slist" "$filter"
 }
 
@@ -20,8 +24,15 @@ portage_list() {
   url="$1"
   filter="$2"
   portage_path='/snapshots/'
-  plist=$(wget -qO - $url$portage_path | sed -ne "s/.*href=\"\(portage-.*bz2\)\".*/\1/p" | sed -ne "s|^|$url$portage_path|p")
+  plist=$(wget -qO - $url$portage_path | sed -ne "s/.*href=\"\(.*portage-.*bz2\)\".*/\1/p")
+  protocol_url=$(echo "$plist"| head -n1 | sed -ne "s/^\(http\|ftp\)\:.*/\1/p")
+  #Надо подумать
+  if [ -z "$protocol_url" ]; then
+    plist=$(echo "$plist"| sed -ne "s|^|$url$portage_path|p")
+  fi
+  #sed -ne "s/^\(http\|ftp\)\:.*/\1/p"   показать протокол из url
   show_result "$plist" "$filter"
+  #sed -ne "s/.*href=\"\(.*portage-.*bz2\)\".*/\1/p" для ftp
 }
 
 show_result(){
