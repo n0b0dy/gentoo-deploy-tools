@@ -15,7 +15,7 @@ stage3_list(){
   slist=$(wget -qO - $url$stage3_path | sed -ne "s/.*href=\"\(.*stage.*bz2\)\".*/\1/p")
   protocol_url=$(echo "$slist"| head -n1 | sed -ne "s/^\(http\|ftp\)\:.*/\1/p")
   if [ -z "$protocol_url" ]; then
-    slist=$( echo "slist" | sed -ne "s|^|$url$stage3_path|p")
+    slist=$( echo "$slist" | sed -ne "s|^|$url$stage3_path|p")
   fi
   show_result "$slist" "$filter"
 }
