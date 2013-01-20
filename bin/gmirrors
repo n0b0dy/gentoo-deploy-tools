@@ -3,7 +3,7 @@ MIRROR_URL="www.gentoo.org/main/en/mirrors3.xml"
 PROTOCOL="http"
 SNFLAG=N
 SEARCH=''
-VERSION=0.4.3
+VERSION=0.5.0
 usage(){ 
   echo "Usage:
   ${0##*/} [options]"

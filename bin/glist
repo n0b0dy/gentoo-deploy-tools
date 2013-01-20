@@ -5,7 +5,7 @@ E_OPTERR=65
 SNFLAG=N
 SFLAGS=0
 PFLAGS=0
-VERSION=0.4.3
+VERSION=0.5.0
 
 stage3_list(){
   url=$1
