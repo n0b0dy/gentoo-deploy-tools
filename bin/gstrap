@@ -2,7 +2,7 @@
 STAGE3_PATH=""
 PORTAGE_PATH=""
 EXTRACT_PATH="."
-V_FLAG="N";
+V_FLAG="Y";
 VERSION=0.4.3 
 dl_bg(){
   url="${1}"
@@ -51,7 +51,7 @@ usage(){
 Application Options:
   -s <name>    stage3
   -p <name>    portage list
-  -v           verbose download
+  -q           simple progress
 
 Version: $VERSION
 Licence: GNU GPL version 3 <http://www.gnu.org/licenses/gpl.html>
@@ -65,7 +65,7 @@ while [ "$1" != -- ]; do
     case "$1" in
         -p) PORTAGE_PATH=$2;shift;;
         -s) STAGE3_PATH=$2;shift;;
-        -v) V_FLAG='Y';;
+        -q) V_FLAG='N';;
         -h) usage;exit 0;;
     esac
     shift
