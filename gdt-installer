@@ -10,6 +10,10 @@ print_fail(){
   echo -e "\033[32m* \033[00m $1  \t \033[37m[\033[31mfail\033[37m]\033[00m"
 }
 
+if [ "$1"=="dev" ]; then
+    gdt_arch="gentoo-deploy-tools-dev"
+fi
+
 if test -f "$HOME/.gdt/gdtrc";then
   rm -rf "$HOME/.gdt/*"  2>&1 >/dev/null
 fi
