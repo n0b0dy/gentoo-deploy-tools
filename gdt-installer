@@ -1,7 +1,6 @@
 #!/bin/bash
-url="https://github.com/n0b0dy/gentoo-deploy-tools/archive/master.tar.gz"
+git="n0b0dy/gentoo-deploy-tools"
 gdt_path="$HOME/.gdt"
-gdt_arch="gentoo-deploy-tools-master"
 
 print_ok(){
   echo -e "\033[32m* \033[00m $1  \t \033[37m[\033[36mok\033[37m]\033[00m"
@@ -11,9 +10,12 @@ print_fail(){
   echo -e "\033[32m* \033[00m $1  \t \033[37m[\033[31mfail\033[37m]\033[00m"
 }
 
-if [ "$1" == "dev" ]; then    
-    url="https://github.com/n0b0dy/gentoo-deploy-tools/archive/dev.tar.gz"
-    gdt_arch="gentoo-deploy-tools-dev"
+if [ "$1" == "dev" ] || [ "$1" == " dev" ]; then    
+    url="http://github.com/${git}/archive/dev.tar.gz"
+    gdt_arch="${git#*/}-dev"
+else
+    url="http://github.com/${git}/archive/master.tar.gz"
+    gdt_arch="${git#*/}-master"
 fi
 
 if test -f "$HOME/.gdt/gdtrc";then
@@ -51,3 +53,5 @@ echo -e "\033[33m» \033[00m Install complete to $gdt_path"
 echo -e "\033[33m» \033[00m Version: \033[4;33m${GDT_VERSION}$(echo $gdt_arch | sed -ne 's/.*-\(dev$\)/\1/p')\033[0;00m"
 unset gdt_path
 unset gdt_arch
+unset git
+unset url
