@@ -1,9 +1,10 @@
 #!/bin/sh
-STAGE3_PATH=""
-PORTAGE_PATH=""
+STAGE3=""
+PORTAGE=""
 EXTRACT_PATH="."
 V_FLAG="Y";
 VERSION=0.5.0 
+set -x
 dl_bg(){
   url="${1}"
   extract_path="${2}"
@@ -19,29 +20,49 @@ dl_bg(){
 }
 
 dl_s(){
-url="${1}"
-extract_path="${2}"
-wget -O- $url | tar -C "${extract_path}" -xpjf -
+    url="${1}"
+    extract_path="${2}"
+    wget -O- $url | tar -C "${extract_path}" -xpjf -
 }
 
 stage3_download(){
+  uri="${1}"
+  EXTRACT_PATH="${2}"
   mkdir -p $EXTRACT_PATH
   if [ "${V_FLAG}" = "Y" ];then
-    dl_s  $STAGE3_PATH $EXTRACT_PATH
+    dl_s  $uri $EXTRACT_PATH
   else
-    dl_bg $STAGE3_PATH $EXTRACT_PATH
+    dl_bg $uri $EXTRACT_PATH
   fi
 }
 
 portage_download() {
+  uri="${1}"
+  EXTRACT_PATH="${2}"
   mkdir -p "${EXTRACT_PATH}/usr"
   if [ "${V_FLAG}" = "Y" ];then
-    dl_s  $PORTAGE_PATH "${EXTRACT_PATH}/usr"
+    dl_s  $uri "${EXTRACT_PATH}/usr"
   else
-    dl_bg $PORTAGE_PATH "${EXTRACT_PATH}/usr"
+    dl_bg $uri "${EXTRACT_PATH}/usr"
   fi
 }
 
+uri_check(){
+  uri="${1}"
+  flag="${2}"
+  url=$(echo "${uri}"|sed -ne '/^\(https\?\|ftp\|file\):\/\//p')
+  
+  if [ -z "${url}" ];then
+      path=$(dirname $(readlink -f -- $0))
+      data=$(${path}/glist ${flag}${uri}) 
+  fi
+
+  if [ -n "${data}" ];then
+      echo "${data}"
+  else
+      echo "${uri}"
+  fi
+}
 
 usage(){ 
 	echo "Usage:
@@ -63,8 +84,8 @@ ARGS=$(getopt -n ${0##*/} -o 'hvs:p:' -- "$@")
 eval set -- "$ARGS"
 while [ "$1" != -- ]; do
     case "$1" in
-        -p) PORTAGE_PATH=$2;shift;;
-        -s) STAGE3_PATH=$2;shift;;
+        -p) PORTAGE=$2;shift;;
+        -s) STAGE3=$2;shift;;
         -q) V_FLAG='N';;
         -h) usage;exit 0;;
     esac
@@ -72,7 +93,7 @@ while [ "$1" != -- ]; do
 done
 
 shift $(expr $# - 1) 
-if [ -z "$1" ] || [ "$1"=="--" ]; then
+if [ -z "$1" ] || [ "$1" = "--" ]; then
     usage
     exit 1
 fi
@@ -81,12 +102,14 @@ EXTRACT_PATH=$1
 
 EXTRACT_PATH=$(echo $EXTRACT_PATH | sed 's/\/$//')
 ####################################################
-if [ -n "$STAGE3_PATH" ]; then
-	stage3_download;
+if [ -n "$STAGE3" ]; then
+    STAGE3=$(uri_check $STAGE3 -s)
+	stage3_download $STAGE3 $EXTRACT_PATH;
 fi
 
-if [ -n "$PORTAGE_PATH" ]; then
-	portage_download;
+if [ -n "$PORTAGE" ]; then
+    PORTAGE=$(uri_check $PORTAGE -p)
+	portage_download $PORTAGE $EXTRACT_PATH;
 fi
 echo "DONE"
 exit 0
