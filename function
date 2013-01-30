@@ -10,7 +10,7 @@ ENV_SAVE(){
  do
     key=$word
     val=$(eval echo $(echo \$"${word}"))
-    echo $key=\"${val}\" >> ${env_file}
+    echo $key="${val}" >> ${env_file}
  done
  env_file="/tmp/.GDT_ENV_${PPID}"
 }
