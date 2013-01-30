@@ -17,5 +17,16 @@ ENV_SAVE(){
 
 ENV_READ(){
   env_file="/tmp/.GDT_ENV_${PPID}"
+  read_variables="${1}"
+  for word in $read_variables
+  do
+      export $(cat ${env_file}|grep ^${word})
+  done
+}
+
+ENV_READ_ALL(){
+  env_file="/tmp/.GDT_ENV_${PPID}"
   eval "$(cat $env_file)"
 }
+
+
