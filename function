@@ -1,6 +1,6 @@
 ENV_CLEAR(){
 env_file="/tmp/.GDT_ENV_${PPID}"
-rm ${env_file}
+echo "" > ${env_file}
 }
 
 ENV_SAVE(){
