@@ -106,7 +106,7 @@ fi
 
 #check mirror params
 if [ -z "$MIRROR" ];then
-  ENV_READ
+  ENV_READ "MIRROR"
   if [ -z "$MIRROR" ];then
     MIRROR=$(echo $DEF_MIRROR | sed 's/\/$//')
   fi

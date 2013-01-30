@@ -20,7 +20,10 @@ ENV_READ(){
   read_variables="${1}"
   for word in $read_variables
   do
-      export $(cat ${env_file}|grep ^${word})
+      var="$(cat ${env_file}|grep ^${word})"
+      if [ -n "${var}" ];then
+          export "${var}"
+      fi
   done
 }
 
