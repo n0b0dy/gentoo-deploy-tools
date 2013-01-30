@@ -38,7 +38,7 @@ mirror_list(){
   
   if [ "$ENV_FLAG" = "Y" ];then
     ENV_CLEAR
-    MIRROR="${mlist}"
+    MIRROR=$(echo "${mlist}"| sed -n 1p)
     ENV_SAVE "MIRROR"
   fi
  
