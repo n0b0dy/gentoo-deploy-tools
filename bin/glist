@@ -5,7 +5,12 @@ E_OPTERR=65
 SNFLAG=N
 SFLAGS=0
 PFLAGS=0
+ENVFLAG=N
 VERSION=0.5.0
+#set -x
+path_f=$(readlink -f -- ${0} | sed -e 's:/[^/]*/[^/]*$::')
+. $path_f/function
+
 
 stage3_list(){
   url=$1
@@ -60,6 +65,7 @@ Application Options:
   -a    Set achitecture x86, amd64
   -n    Show numbers
   -m    Set mirror
+  -e    export enviroment
   -h    Show help options
 
 Version: $VERSION
@@ -70,7 +76,7 @@ EOF
 
 if [ "$#" -eq 0 ]; then usage;exit 1;fi
 #getopt parser
-ARGS=$(getopt -n ${0##*/} -o 'hns::p::a:m:' -- "$@")
+ARGS=$(getopt -n ${0##*/} -o 'ehns::p::a:m:' -- "$@")
 eval set -- "$ARGS"
 
 
@@ -80,7 +86,8 @@ while [ "$1" != -- ]; do
         -s) FSTAGE3=$2;SFLAGS=1;shift;;
         -n) SNFLAG=Y;;
         -a) ARCH=$2;shift;;
-        -m) MIRROR_ARG=$2;shift;;
+        -m) MIRROR=$2;shift;;
+        -e) ENVFLAG=Y;;
         -h) usage;exit 0;;
     esac
     shift
@@ -96,21 +103,26 @@ march=$(uname -m )
   esac
 fi
 
-#check mirror params
-if [ -z "$mirror" ]; then
-  mirror=$(echo $DEF_MIRROR | sed 's/\/$//')
-fi
 
-if [ -n "$MIRROR_ARG" ];then 
-  mirror=$(echo $MIRROR_ARG | sed 's/\/$//')
+#check mirror params
+if [ -z "$MIRROR" ];then
+  ENV_READ
+  if [ -z "$MIRROR" ];then
+    MIRROR=$(echo $DEF_MIRROR | sed 's/\/$//')
+  fi
 fi
 
 if [ "$SFLAGS" -eq 1 ];then
-  stage3_list "$mirror" "$ARCH" "$FSTAGE3"
+    STAGE3=$(stage3_list "$MIRROR" "$ARCH" "$FSTAGE3")
+    echo "${STAGE3}"
 fi
 
 if [ "$PFLAGS" -eq 1 ];then
-  portage_list "$mirror" "$FPORTAGE"
+    PORTAGE=$(portage_list "$MIRROR" "$FPORTAGE")
+    echo "${PORTAGE}"
 fi
-
+if [ "$ENVFLAG" = "Y" ];then
+    ENV_CLEAR
+    ENV_SAVE "MIRROR STAGE3 PORTAGE"
+fi
 exit 0
