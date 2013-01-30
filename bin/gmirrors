@@ -1,9 +1,14 @@
-#!/bin/sh
+#!/bin/bash
 MIRROR_URL="www.gentoo.org/main/en/mirrors3.xml"
 PROTOCOL="http"
 SNFLAG=N
+ENV_FLAG=N
 SEARCH=''
 VERSION=0.5.0
+
+path_f=$(readlink -f -- ${0} | sed -e 's:/[^/]*/[^/]*$::')
+. $path_f/function
+
 usage(){ 
   echo "Usage:
   ${0##*/} [options]"
@@ -12,7 +17,8 @@ usage(){
 Application Options:
   -p    protocol ftp, http, rsync
   -s    search mirror
-  -n    show line number 
+  -n    show line numbe
+  -e    export enviroment mirror 
   -h    help
 
 Version: $VERSION
@@ -20,7 +26,7 @@ Licence: GNU GPL version 3 <http://www.gnu.org/licenses/gpl.html>
 EOF
 exit 0
 }
- 
+
 mirror_list(){
   protocol=$1
   search=$2
@@ -38,7 +44,7 @@ mirror_list(){
 }
 
 
-ARGS=$(getopt -n $(basename "$0") -o 'nhp:s::' -- "$@")
+ARGS=$(getopt -n $(basename "$0") -o 'enhp:s::' -- "$@")
 
 eval set -- "$ARGS"
 
@@ -48,6 +54,7 @@ do
        -p) PROTOCOL=$(echo $2 | sed -e 's/,/\\\|/g');shift;;
        -s) SEARCH=$2; shift;;
        -n) SNFLAG=Y;;
+       -e) ENV_FLAG=Y;;
        -h) usage;;
        --) shift;break;;
        -*) usage;;
@@ -57,6 +64,11 @@ do
 done
 shift
 
-mirror_list $PROTOCOL $SEARCH
+MIRROR=$(mirror_list $PROTOCOL $SEARCH)
+if [ "$ENV_FLAG" = "Y" ];then
+    ENV_CLEAR
+    ENV_SAVE "MIRROR"
+fi
+echo "${MIRROR}"
 exit 0
 

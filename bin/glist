@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 DEF_MIRROR="http://mirror.yandex.ru/gentoo-distfiles/"
 DEF_ARCH="amd64"
 E_OPTERR=65

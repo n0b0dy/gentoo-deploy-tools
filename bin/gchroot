@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 JOIN=Y
 VERSION=0.5.0
 usage(){ 

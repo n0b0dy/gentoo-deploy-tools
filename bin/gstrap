@@ -1,10 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 STAGE3=""
 PORTAGE=""
 EXTRACT_PATH="."
 V_FLAG="Y";
 VERSION=0.5.0 
-set -x
 dl_bg(){
   url="${1}"
   extract_path="${2}"
