@@ -1,0 +1,21 @@
+ENV_CLEAR(){
+env_file="/tmp/.GDT_ENV_${PPID}"
+rm ${env_file}
+}
+
+ENV_SAVE(){
+ save_variables="${1}"
+ env_file="/tmp/.GDT_ENV_${PPID}"
+ for word in $save_variables
+ do
+    key=$word
+    val=$(eval echo $(echo \$"${word}"))
+    echo $key=\"${val}\" >> ${env_file}
+ done
+ env_file="/tmp/.GDT_ENV_${PPID}"
+}
+
+ENV_READ(){
+  env_file="/tmp/.GDT_ENV_${PPID}"
+  eval "$(cat $env_file)"
+}
