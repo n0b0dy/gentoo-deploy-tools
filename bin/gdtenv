@@ -1,0 +1,49 @@
+#!/bin/bash
+VERSION=0.5.0
+env_file="/tmp/.GDT_ENV_${PPID}"
+
+path_f=$(readlink -f -- ${0} | sed -e 's:/[^/]*/[^/]*$::')
+. $path_f/function
+
+usage(){
+echo "Usage:
+  ${0##*/} [options]"
+cat <<EOF
+
+Application Options:
+  -l    list enviroment
+  -c    clear enviroment
+  -s    set env
+Version: $VERSION
+Licence: GNU GPL version 3 <http://www.gnu.org/licenses/gpl.html>
+EOF
+}
+
+env_list(){
+cat "${env_file}"
+}
+
+ENV_SET(){
+keyval=${1}
+key=${1%%=*}
+sed -ie "/^$key\=/d" ${env_file}
+echo ${keyval} >> ${env_file}
+}
+
+if [ "$#" -eq 0 ]; then usage;exit 1;fi
+#getopt parser
+ARGS=$(getopt -n ${0##*/} -o 'hlc::s:' -- "$@")
+eval set -- "$ARGS"
+
+
+while [ "$1" != -- ]; do
+    case "$1" in
+        -l) env_list;exit;;
+        -c) ENV_CLEAR $2;exit;;
+        -s) ENV_SET $2;exit;;
+        -h) usage;exit 0;;
+    esac
+    shift
+done
+
+
