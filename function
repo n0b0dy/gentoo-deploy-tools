@@ -20,6 +20,21 @@ ENV_SAVE(){
  env_file="/tmp/.GDT_ENV_$PPID"
 }
 
+ENV_SAVE_LIST(){
+    env_file="/tmp/.GDT_ENV_$PPID"
+    key=$1
+    val=$2
+    echo $key=$val >> "$env_file"
+}
+
+ENV_SET(){
+    env_file="/tmp/.GDT_ENV_$PPID"
+    keyval=${1}
+    key=${1%%=*}
+    sed -ie "/^$key\=/d" ${env_file}
+    echo ${keyval} >> ${env_file}
+}
+
 ENV_READ(){
   env_file="/tmp/.GDT_ENV_$PPID"
   read_variables="$1"

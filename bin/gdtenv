@@ -27,13 +27,6 @@ env_list(){
   fi
 }
 
-ENV_SET(){
-keyval=${1}
-key=${1%%=*}
-sed -ie "/^$key\=/d" ${env_file}
-echo ${keyval} >> ${env_file}
-}
-
 if [ "$#" -eq 0 ]; then usage;exit 1;fi
 #getopt parser
 ARGS=$(getopt -n ${0##*/} -o 'hlc::s:' -- "$@")
