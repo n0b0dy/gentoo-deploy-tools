@@ -32,18 +32,19 @@ mirror_list(){
   search=$2
   mlist=$(wget -qO - $MIRROR_URL | grep '<uri' | sed -e 's/<[^>]*>//g' | sed -e 's/^\s*//g' | sed -ne "/^\($protocol\)/p"  | sort) 
 
+  if [ "$SNFLAG" = "Y" ]; then
+       mlist=$(echo "$mlist" | sed '/./=' | sed '/./N; s/\n/ /')
+  fi
+
+
   if [ -n "$search" ]; then
       mlist=$(echo "$mlist" | sed -n "$search p")
   fi
   
   if [ "$ENV_FLAG" = "Y" ];then
     ENV_CLEAR
-    MIRROR=$(echo "${mlist}" | sed -ne 1p)
+    MIRROR=$(echo "${mlist}" | sed -e "s/^[1-9]\{1,\}\s//" | sed -ne 1p)
     ENV_SAVE "MIRROR"
-  fi
- 
-  if [ "$SNFLAG" = "Y" ]; then
-       mlist=$(echo "$mlist" | sed '/./=' | sed '/./N; s/\n/ /')
   fi
       
   echo "${mlist}"
