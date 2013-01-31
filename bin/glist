@@ -108,9 +108,11 @@ fi
 if [ -z "$MIRROR" ];then
   ENV_READ "MIRROR"
   if [ -z "$MIRROR" ];then
-    MIRROR=$(echo $DEF_MIRROR | sed 's/\/$//')
+    MIRROR=$DEF_MIRROR
   fi
 fi
+#remove mirror end slash
+MIRROR=$(echo $MIRROR | sed 's/[\/]\{1,\}$//' )
 
 if [ "$SFLAGS" -eq 1 ];then
     STAGE3=$(stage3_list "$MIRROR" "$ARCH" "$FSTAGE3")
