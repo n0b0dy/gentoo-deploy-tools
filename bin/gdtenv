@@ -1,6 +1,5 @@
 #!/bin/bash
 VERSION=0.5.0
-env_file="/tmp/.GDT_ENV_${PPID}"
 
 path_f=$(readlink -f -- ${0} | sed -e 's:/[^/]*/[^/]*$::')
 . $path_f/function

@@ -11,7 +11,6 @@ VERSION=0.5.0
 path_f=$(readlink -f -- ${0} | sed -e 's:/[^/]*/[^/]*$::')
 . $path_f/function
 
-
 stage3_list(){
   url=$1
   arch=$2
@@ -95,12 +94,12 @@ done
 
 #define system architecture
 if [ -z "$ARCH" ];then
-ARCH=$DEF_ARCH
 march=$(uname -m )
   case $march in
     x86_64) ARCH="amd64";;
     i686|i586) ARCH="x86";;
   esac
+ENV_READ "ARCH"
 fi
 
 

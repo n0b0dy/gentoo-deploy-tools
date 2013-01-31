@@ -1,5 +1,9 @@
+
+if [ -z "$env_file" ];then  
+    export  env_file="/tmp/.GDT_ENV_$PPID"
+fi
+
 ENV_CLEAR(){
-  env_file="/tmp/.GDT_ENV_$PPID"
   key=$1
   if [ -n "${key}" ];then
       sed -ie "/^$key\=/d" $env_file
@@ -10,25 +14,21 @@ ENV_CLEAR(){
 
 ENV_SAVE(){
  save_variables="$1"
- env_file="/tmp/.GDT_ENV_$PPID"
  for word in $save_variables
  do
     key=$word
     val=$(eval echo $(echo \$"$word"))
     echo $key="$val" >> $env_file
  done
- env_file="/tmp/.GDT_ENV_$PPID"
 }
 
 ENV_SAVE_LIST(){
-    env_file="/tmp/.GDT_ENV_$PPID"
     key=$1
     val=$2
     echo $key=$val >> "$env_file"
 }
 
 ENV_SET(){
-    env_file="/tmp/.GDT_ENV_$PPID"
     keyval=${1}
     key=${1%%=*}
     sed -ie "/^$key\=/d" ${env_file}
@@ -36,7 +36,6 @@ ENV_SET(){
 }
 
 ENV_READ(){
-  env_file="/tmp/.GDT_ENV_$PPID"
   read_variables="$1"
   for word in $read_variables
   do
@@ -48,7 +47,6 @@ ENV_READ(){
 }
 
 ENV_READ_ALL(){
-  env_file="/tmp/.GDT_ENV_$PPID"
   eval "$(cat $env_file)"
 }
 
