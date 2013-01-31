@@ -20,7 +20,11 @@ EOF
 }
 
 env_list(){
-cat "${env_file}"
+  if [ -f "$env_file" ];then
+    cat "${env_file}"
+  else
+      echo env file empty
+  fi
 }
 
 ENV_SET(){

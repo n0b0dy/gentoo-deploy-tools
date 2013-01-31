@@ -123,6 +123,6 @@ if [ "$PFLAGS" -eq 1 ];then
 fi
 if [ "$ENVFLAG" = "Y" ];then
     ENV_CLEAR
-    ENV_SAVE "MIRROR STAGE3 PORTAGE"
+    ENV_SAVE "MIRROR STAGE3 PORTAGE ARCH"
 fi
 exit 0
