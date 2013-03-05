@@ -1,0 +1,108 @@
+#!/bin/bash
+STAGE3=""
+PORTAGE=""
+EXTRACT_PATH="."
+V_FLAG="Y";
+
+#path_f=$(readlink -f -- ${0} | sed -e 's:/[^/]*/[^/]*$::')
+. "$(readlink -f -- ${0} | sed -e 's:/[^/]*$::')/function"
+
+
+dl_bg(){
+  url="${1}"
+  extract_path="${2}"
+  name="$(basename $url)"
+  fifo_path="/tmp/gstrap_fifo"
+  if test -p "${fifo_path}";then rm -f "${fifo_path}" ;fi
+  mkfifo $fifo_path
+  ( wget --progress=dot -O-  $url  2> $fifo_path | tar -C "${extract_path}" -xpjf - & )
+  echo -n "Download: ${name}     "
+  cat ${fifo_path} | grep --line-buffered "%" | sed -u -e "s,\.,,g" | awk '{printf("\b\b\b\b\b%5s", $2)}'
+  echo "\b\b\b\b"
+  rm -f "${fifo_path}"
+}
+
+dl_s(){
+    url="${1}"
+    extract_path="${2}"
+    wget -O- $url | tar -C "${extract_path}" -xpjf -
+}
+
+download(){
+  uri="${1}"
+  EXTRACT_PATH="${2}"
+  mkdir -p $EXTRACT_PATH
+  if [ "${V_FLAG}" = "Y" ];then
+    dl_s  $uri $EXTRACT_PATH
+  else
+    dl_bg $uri $EXTRACT_PATH
+  fi
+}
+
+uri_check(){
+  uri="${1}"
+  flag="${2}"
+  url=$(echo "${uri}"|sed -ne '/^\(https\?\|ftp\|file\):\/\//p')
+  
+  if [ -z "${url}" ];then
+      path=$(dirname $(readlink -f -- $0))
+      if [ "$flag" = "s" ];then data=$(stage3 "$uri");fi
+  fi
+
+  if [ -n "${data}" ];then
+      echo "${data}"
+  else
+      echo "${uri}"
+  fi
+}
+
+usage(){ 
+	echo "Usage:
+  ${0##*/} [options] [extract path]"
+	cat <<EOF
+
+Application Options:
+  -s <name>    stage3
+  -p <name>    portage list
+  -q           simple progress
+
+Version: $VERSION
+Licence: GNU GPL version 3 <http://www.gnu.org/licenses/gpl.html>
+EOF
+}
+ 
+if [ "$#" -eq 0 ]; then usage;exit 1;fi
+ARGS=$(getopt -n ${0##*/} -o 'hvs:p:' -- "$@")
+eval set -- "$ARGS"
+while [ "$1" != -- ]; do
+    case "$1" in
+        -p) PORTAGE=$2;shift;;
+        -s) STAGE3=$2;shift;;
+        -q) V_FLAG='N';;
+        -h) usage;exit 0;;
+    esac
+    shift
+done
+
+shift $(expr $# - 1) 
+if [ -z "$1" ] || [ "$1" = "--" ]; then
+    usage
+    exit 1
+fi
+EXTRACT_PATH=$1
+####################################################
+
+EXTRACT_PATH=$(echo $EXTRACT_PATH | sed 's/\/$//')
+####################################################
+if [ -n "$STAGE3" ]; then
+    STAGE3=$(uri_check $STAGE3 -s)
+	download "$STAGE3" "$EXTRACT_PATH"
+fi
+
+if [ -n "$PORTAGE" ]; then
+    PORTAGE=$(uri_check $PORTAGE -p)
+	download "$PORTAGE" "$EXTRACT_PATH/usr"
+fi
+echo "DONE"
+exit 0
+

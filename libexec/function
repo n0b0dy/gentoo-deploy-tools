@@ -1,0 +1,127 @@
+#!/bin/bash
+VERSION=0.6.0
+if [ -z "$env_file" ];then  
+    export  env_file="/tmp/.GDT_ENV_$PPID"
+fi
+
+ENV_CLEAR(){
+    key=$1
+    if [ -n "${key}" ];then
+        sed -ie "/^$key\=/d" $env_file
+    else
+        echo "" > $env_file
+    fi
+}
+
+ENV_SAVE(){
+    save_variables="$1"
+     for word in $save_variables
+     do
+        key=$word
+        val=$(eval echo $(echo \$"$word"))
+        if [ -n "$val" ];then
+            if [ -f "$env_file" ];then sed -ie "/^$key\=/d" ${env_file};fi
+            echo $key="$val" >> $env_file
+        fi
+     done
+}
+
+ENV_SAVE_LIST(){
+    key=$1
+    val=$2
+    echo $key=$val >> "$env_file"
+}
+
+ENV_SET(){
+    keyval=${1}
+    key=${1%%=*}
+    sed -ie "/^$key\=/d" ${env_file}
+    echo ${keyval} >> ${env_file}
+}
+
+ENV_READ(){
+    read_variables="$1"
+    if [ ! -f "$env_file" ];then return 0;fi
+    for word in $read_variables
+    do
+        var="$(cat $env_file|grep ^$word)"
+        if [ -n "${var}" ];then
+            export "${var}"
+        fi
+    done
+}
+
+ENV_READ_ALL(){
+    eval "$(cat $env_file)"
+}
+
+##mirror function
+#var protocol filter
+MIRROR_LIST(){
+  protocol=$1
+  filter=$2
+  mlist=$(wget -qO - http://www.gentoo.org/main/en/mirrors3.xml | grep '<uri' | sed -e 's/<[^>]*>//g' | sed -e 's/^\s*//g' | sed -ne "/^\($protocol\)/p"  | sort) 
+
+  if [ "$SNFLAG" = "Y" ]; then
+       mlist=$(echo "$mlist" | sed '/./=' | sed '/./N; s/\n/ /')
+  fi
+
+
+  if [ -n "$filter" ]; then
+      mlist=$(echo "$mlist" | sed -n "$filter p")
+  fi 
+        
+  echo "${mlist}"
+}
+
+##list function
+GET_MARCH(){
+  MARCH="$1"
+  if [ -z "$MARCH" ];then MARCH=$(uname -m ) ;fi
+  case "$MARCH" in
+    x86_64|amd64) MARCH="amd64";;
+    i686|i586|x86) MARCH="x86";;
+  esac
+  echo $MARCH;
+}
+
+STAGE3_LIST(){
+  mirror="$(echo $1 | sed 's/[\/]\{1,\}$//' )"
+  filter=$2
+  march=$(GET_MARCH "$3")
+  stage3_path="/releases/$march/current-stage3/"
+  slist=$(wget -qO - $mirror$stage3_path | sed -ne "s/.*href=\"\(.*stage.*bz2\)\".*/\1/p")
+  protocol_url=$(echo "$slist"| head -n1 | sed -ne "s/^\(http\|ftp\)\:.*/\1/p")
+  if [ -z "$protocol_url" ]; then
+    slist=$( echo "$slist" | sed -ne "s|^|$mirror$stage3_path|p")
+  fi
+  SHOW_RESULT "$slist" "$filter"
+}
+
+PORTAGE_LIST() {
+  mirror="$(echo $1 | sed 's/[\/]\{1,\}$//' )"
+  filter="$2"
+  portage_path='/snapshots/'
+  plist=$(wget -qO - $mirror$portage_path | sed -ne "s/.*href=\"\(.*portage-.*bz2\)\".*/\1/p")
+  protocol_url=$(echo "$plist"| head -n1 | sed -ne "s/^\(http\|ftp\)\:.*/\1/p")
+  #Надо подумать
+  if [ -z "$protocol_url" ]; then
+    plist=$(echo "$plist"| sed -ne "s|^|$mirror$portage_path|p")
+  fi
+  SHOW_RESULT "$plist" "$filter"
+}
+
+SHOW_RESULT(){
+  list=$1
+  filter=$2
+  if [ "$SNFLAG" = "Y" ]; then
+    list=$(echo "$list" | sed '/./=' | sed '/./N; s/\n/ /')
+  fi
+  
+  if [ -n "$filter" ]; then
+    echo "$list" | sed -n "$filter p"
+  else
+    echo "$list"
+  fi
+}
+

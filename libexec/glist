@@ -1,0 +1,80 @@
+#!/bin/bash
+DEF_MIRROR="http://mirror.yandex.ru/gentoo-distfiles/"
+E_OPTERR=65
+SNFLAG=N
+SFLAGS=0
+PFLAGS=0
+ENVFLAG=N
+#set -x
+#path_f=$(readlink -f -- ${0} | sed -e 's:/[^/]*/[^/]*$::')
+#. $path_f/function
+
+. "$(readlink -f -- ${0} | sed -e 's:/[^/]*$::')/function"
+
+usage(){ 
+echo "Usage:
+  ${0##*/} [options]"
+cat <<EOF
+
+Application Options:
+  -s    Stage3 list flag
+  -p    Portage list flag
+  -a    Set achitecture x86, amd64
+  -n    Show numbers
+  -m    Set mirror
+  -e    export enviroment
+  -h    Show help options
+
+Version: $VERSION
+Licence: GNU GPL version 3 <http://www.gnu.org/licenses/gpl.html>
+EOF
+}
+
+
+if [ "$#" -eq 0 ]; then usage;exit 1;fi
+#getopt parser
+ARGS=$(getopt -n ${0##*/} -o 'ehns::p::a:m:' -- "$@")
+eval set -- "$ARGS"
+
+
+while [ "$1" != -- ]; do
+    case "$1" in
+        -p) FPORTAGE=$2;PFLAGS=1;shift;;
+        -s) FSTAGE3=$2;SFLAGS=1;shift;;
+        -n) SNFLAG=Y;;
+        -a) MARCH=$2;shift;;
+        -m) MIRROR=$2;shift;;
+        -e) ENVFLAG=Y;;
+        -h) usage;exit 0;;
+    esac
+    shift
+done
+
+#define system architecture
+
+
+#check mirror params
+if [ -z "$MIRROR" ];then
+  ENV_READ "MIRROR"
+  if [ -z "$MIRROR" ];then
+    MIRROR=$DEF_MIRROR
+  fi
+fi
+#remove mirror end slash
+MIRROR=$(echo $MIRROR | sed 's/[\/]\{1,\}$//' )
+
+if [ "$SFLAGS" -eq 1 ];then
+    if [ -z "$MARCH" ];then ENV_READ "MARCH";fi
+    STAGE3=$(STAGE3_LIST "$MIRROR" "$FSTAGE3" "$MARCH")
+    echo "${STAGE3}"
+fi
+
+if [ "$PFLAGS" -eq 1 ];then
+    PORTAGE=$(PORTAGE_LIST "$MIRROR" "$FPORTAGE")
+    echo "${PORTAGE}"
+fi
+if [ "$ENVFLAG" = "Y" ];then
+    ENV_CLEAR
+    ENV_SAVE "MIRROR STAGE3 PORTAGE MARCH"
+fi
+exit 0

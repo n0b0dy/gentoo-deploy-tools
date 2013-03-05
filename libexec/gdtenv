@@ -1,0 +1,108 @@
+#!/bin/bash
+DEF_MIRROR="http://mirror.yandex.ru/gentoo-distfiles/"
+
+. "$(readlink -f -- ${0} | sed -e 's:/[^/]*$::')/function"
+
+usage(){
+echo "Usage:
+  ${0##*/} [options]"
+cat <<EOF
+
+Application Options:
+  -s    stage3
+  -p    portage
+  -a    arch x86,x64
+  -m    set mirror
+env manipulation
+
+  -l    list enviroment
+  -c    clear enviroment
+
+Version: $VERSION
+Licence: GNU GPL version 3 <http://www.gnu.org/licenses/gpl.html>
+EOF
+}
+
+#Поменять код
+env_list(){
+  if [ -f "$env_file" ];then
+    cat "${env_file}"
+  else
+      echo env file empty
+  fi
+}
+
+#MIRROR 
+url_get(){
+  uri="$1"
+  flag="$2"
+  data=''
+  url=$(echo "${uri}"|sed -ne '/^\(https\?\|ftp\|file\):\/\//p')
+  
+  if [ -z "${url}" ];then
+        case "$flag" in
+            mirror) data=$(MIRROR_LIST "http" "$uri");;
+            stage3) READ_ENV "MARCH"; data=$(STAGE3_LIST "$DEF_MIRROR" "$uri" "$MARCH");;
+            portage) data=$(PORTAGE_LIST "$DEF_MIRROR" "$uri");;
+        esac
+  fi
+
+  if [ -n "${data}" ];then
+      echo "${data}"
+  else
+      echo "${uri}"
+  fi
+}
+
+
+#getopt parser
+ARGS=$(getopt -n ${0##*/} -o 'hlc::s:p:a:m:' -- "$@")
+eval set -- "$ARGS"
+
+
+while [ "$1" != -- ]; do
+    case "$1" in
+        -l) env_list;exit;;
+        -c) ENV_CLEAR $2;exit;;
+       # -s) ENV_SET $2;exit;;
+        -m) md="$2";mf=Y;shift;; 
+        -a) ad="$2";af=Y;shift;;
+        -s) sd="$2";sf=Y;shift;;
+        -p) pd="$2";pf=Y;shift;;
+        -h) usage;exit 0;;
+    esac
+    shift
+done
+
+if [ "$mf" = "Y" ];then
+    MIRROR="$1"
+    MIRROR=$(url_get "$MIRROR" "mirror")
+    ENV_SAVE "MIRROR"
+fi
+
+if [ "$af" = "Y" ];then
+    MARCH=$(GET_MARCH "$ad")
+    ENV_SAVE "MARCH"    
+fi
+
+if [ "$sf" = "Y" ];then
+    STAGE3="$sd"
+    MARCH=$(GET_MARCH "$MARCH")
+    STAGE3=$(url_get "$STAGE3" "stage3")
+    ENV_SAVE "STAGE3"
+fi
+
+if [ "$pf" = "Y" ];then
+    PORTAGE="$pd"
+    PORTAGE=$(url_get "$PORTAGE" "portage")
+    ENV_SAVE "PORTAGE"
+fi
+ENV_READ "MIRROR MARCH STAGE3 PORTAGE"
+if [ -z "$MIRROR" ];then MIRROR="$DEF_MIRROR";fi
+if [ -z "$MARCH" ];then MARCH="$(GET_MARCH)";fi  
+echo "mirror:   $MIRROR"
+echo "march:    $MARCH"
+if [ -n "$STAGE3"  ];then echo "stage3:   $STAGE3" ;fi
+if [ -n "$PORTAGE" ];then echo "porage:   $PORTAGE";fi
+
+

@@ -1,0 +1,60 @@
+#!/bin/bash
+PROTOCOL="http"
+SNFLAG=N
+ENVFLAG=N
+SEARCH=''
+
+#path_f=$(readlink -f -- ${0} | sed -e 's:/[^/]*/[^/]*$::')
+#. $path_f/function
+. "$(readlink -f -- ${0} | sed -e 's:/[^/]*$::')/function"
+
+usage(){ 
+  echo "Usage:
+  ${0##*/} [options]"
+  cat <<EOF
+
+Application Options:
+  -p    protocol ftp, http, rsync
+  -f    filter mirror
+  -n    show line numbe
+  -e    export enviroment mirror 
+  -h    help
+
+Version: $VERSION
+Licence: GNU GPL version 3 <http://www.gnu.org/licenses/gpl.html>
+EOF
+exit 0
+}
+
+
+
+ARGS=$(getopt -n $(basename "$0") -o 'enhp:f::' -- "$@")
+
+eval set -- "$ARGS"
+
+while [ "$1" != -- ]
+do
+    case "$1" in
+       -p) PROTOCOL=$(echo $2 | sed -e 's/,/\\\|/g');shift;;
+       -f) FILTER=$2; shift;;
+       -n) SNFLAG=Y;;
+       -e) ENVFLAG=Y;;
+       -h) usage;;
+       --) shift;break;;
+       -*) usage;;
+        *) break;;            #better be the crawl directory
+    esac
+    shift
+done
+shift
+
+MIRROR=$(MIRROR_LIST $PROTOCOL $FILTER)
+echo "$MIRROR"
+if [ "$ENVFLAG" = "Y" ];then
+    ENV_CLEAR
+    MIRROR=$(echo "${MIRROR}" | sed -e "s/^[1-9]\{1,\}\s//" | sed -ne 1p)
+    ENV_SAVE "MIRROR"
+fi
+
+exit 0
+
