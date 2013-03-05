@@ -45,5 +45,6 @@ fi
 
 if [ $JOIN = "Y" ];then
   chroot $mpath  /bin/su -
+  echo "chroot exit"
 fi
 exit 0
