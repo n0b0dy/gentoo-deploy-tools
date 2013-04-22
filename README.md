@@ -22,10 +22,11 @@ Example use case tools
 
 ## Review
 
+- **gdtenv**  Edit deploy enviroment 
 - **gmirror** Show and search gentoo mirrors.
 - **gchroot** Preparing chroot enviroment. 
 - **gstrap**  Download and extract stage3, portage archive.
-- **glist** Show and search stage3, portage on selected mirros.
+- **glist**   Show and search stage3, portage on selected mirros.
 
 ##License
 ![GPLv3](http://www.gnu.org/graphics/gplv3-127x51.png)
